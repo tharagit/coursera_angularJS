@@ -1,30 +1,57 @@
 (function () {
 'use strict';
 
-angular.module('LunchCheckApp', [])
-.controller('LunchCheckController', LunchCheckController);
+angular.module('ShoppingListCheckOff', [])
+.controller('ToBuyController', ToBuyController)
+.controller('AlreadyBoughtController', AlreadyBoughtController)
+.service('ShoppingListCheckOffService', ShoppingListCheckOffService);
 
-LunchCheckController.$inject = ['$scope', '$filter'];
-function LunchCheckController($scope, $filter) {
-  //$scope.menuItem = "";
-  $scope.sayMessage = "";
+ToBuyController.$inject = ['ShoppingListCheckOffService'];
+function ToBuyController(ShoppingListCheckOffService) {
+  var itemAdder = this;
 
-  $scope.checkIfTooMuch = function () {
-    if(! $scope.menuItem) {
-      $scope.sayMessage = "Please enter data first!";
-    } else  {
-      var re = /\s*,\s*/;
-      var items = $scope.menuItem.split(re);
+  itemAdder.itemName = "";
+  itemAdder.itemQuantity = "";
 
-      if(items.length > 3) {
-        $scope.sayMessage = "Too much!";
-      } else
-      if(items.length > 0 && items.length <= 3) {
-        $scope.sayMessage = "Enjoy!";
-      }
-    }
+  itemAdder.addItem = function () {
+    ShoppingListCheckOffService.addItem(itemAdder.itemName, itemAdder.itemQuantity);
+  }
+}
+
+
+AlreadyBoughtController.$inject = ['ShoppingListCheckOffService'];
+function AlreadyBoughtController(ShoppingListCheckOffService) {
+  var showList = this;
+
+  showList.items = ShoppingListCheckOffService.getItems();
+
+  showList.removeItem = function (itemIndex) {
+    ShoppingListCheckOffService.removeItem(itemIndex);
+  };
+}
+
+function ShoppingListCheckOffService() {
+  var service = this;
+
+  // List of shopping items
+  var tobuyitems = [];
+  var boughtitems = [];
+
+  service.addItem = function (itemName, quantity) {
+    var item = {
+      name: itemName,
+      quantity: quantity
+    };
+    items.push(item);
   };
 
+  service.removeItem = function (itemIdex) {
+    items.splice(itemIdex, 1);
+  };
+
+  service.getItems = function () {
+    return items;
+  };
 }
 
 })();
